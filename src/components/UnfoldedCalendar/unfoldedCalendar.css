@@ -1,0 +1,56 @@
+.tableCalendar {
+    font-size: 12px;
+    table-layout: fixed;
+    width: auto;
+    margin: 0 auto;
+  }
+
+  .tableCalendar th, 
+  .tableCalendar td {
+    width: 30px;
+    height: 30px;
+    padding: 2px;
+    border: 1px solid #4d4f5c;
+    vertical-align: middle;
+    text-align: center;
+  }
+
+  .tableCalendar th {
+    font-weight: normal;
+    background-color: #4d4f5c;
+    color: #fff;
+  }
+  .tableCalendar th:first-letter {
+    text-transform: uppercase;
+  }
+
+  .tableCalendar th.weekend {
+    color: #ddd;
+  }
+
+
+  .title {
+    border-color: #fff;
+    border-width: 1px 0 1px 1px;
+    padding-right: 15px;
+    text-align: right;
+    text-transform: uppercase;
+    background-color: #fff;
+    width: auto;
+    height: auto;
+  }
+
+
+    .total .title {
+      background-color: #fff;
+    }
+
+    .total td {
+      background-color: #ddd;
+    }
+  
+
+
+  .bold {
+    font-weight: bold;
+  }
