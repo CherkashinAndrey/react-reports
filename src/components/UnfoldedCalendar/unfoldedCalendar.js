@@ -19,7 +19,6 @@ class UnfoldedCalendar extends Component {
 
     render () {
         let _calendarSpiner = this.props.error ? <p>Ingredients can't be loaded!</p> : <Spinner />;
-        console.log('33333333333333333', this.props);
         if ( this.props.calendar &&  this.props.calendar.days) {
 
             const weekDays = this.props.calendar.days.map((el, i) => {
@@ -35,7 +34,11 @@ class UnfoldedCalendar extends Component {
                 const calendarDateDays = this.props.calendar.days.map((item, index) => {
                     return ( <td key={index}>  {item.data[el.slug] ? item.data[el.slug]: ''}  </td>);
                 });
-                return (<tr key={i}>  {el.title}  {calendarDateDays} </tr>)
+                return (
+                <tr key={i}>  
+                    <td> {el.title} </td> 
+                    {calendarDateDays} 
+                </tr>)
             });
 
             const total = this.props.calendar.days.map((el, i) => {
@@ -75,7 +78,6 @@ class UnfoldedCalendar extends Component {
             );
         }
         // {salad: true, meat: false, ...}
-        console.log(99877);
         return (
             <Aux>
                 {_calendarSpiner}

@@ -13,6 +13,7 @@ import axios from '../../axios-orders';
 import DatePicker from 'react-datepicker';
 // import './../../../node_modules/react-datepicker/dist/react-datepicker.css';
 import UnfoldedCalendar from '../../components/UnfoldedCalendar/unfoldedCalendar';
+import * as moment from 'moment';
 
 class BurgerBuilder extends Component {
 
@@ -20,7 +21,12 @@ class BurgerBuilder extends Component {
         purchasing: false,
         startDate: new Date(),
         spent_time: '',
-        description: ''
+        description: '',
+        editTracker: {
+            startDate: new Date(),
+            spent_time: '',
+            description: '',
+        }
     }
 
     componentDidMount () {
@@ -58,9 +64,30 @@ class BurgerBuilder extends Component {
 
     handleChange = startDate => this.setState({ startDate })
 
-    onChangeHandler = (term, e) => {
-        console.log(term, e.target.value)
-        this.setState({[term]: e.target.value})
+    onChangeHandler = (term, e, edit) => {
+        edit !== 'new' ? this.setState(
+             {editTracker : {...this.state.editTracker, [term]: e.target.value } }
+            ) : this.setState({[term]: e.target.value})
+    }
+
+    onChangeHadlerState = (el, i) => {   
+        this.setState({
+            editTracker : {
+                startDate: new Date(el.date),
+                spent_time: el.spent_time,
+                description: el.description
+            } 
+ 
+        })
+        this.props.onEditTracker(el, i)
+    }
+
+    onCopyReport = (el) => {
+        this.setState({
+            startDate: new Date(el.date),
+            spent_time: el.spent_time,
+            description: el.description
+        })
     }
 
     render () {
@@ -72,55 +99,70 @@ class BurgerBuilder extends Component {
             disabledInfo[key] = disabledInfo[key] <= 0
         }
         let orderSummary = null;
-        let burger = this.props.error ? <p>Ingredients can't be loaded!</p> : <Spinner />;
-        
+        let monthReports = [];
+        let report = this.props.error ? <p>Ingredients can't be loaded!</p> : <Spinner />;
+        const listReportsMonth = [];
+        for (let i=0; i<=1; i++) {
+            listReportsMonth.push( moment().startOf('month').subtract(i, 'month').format('MMM'));  
+        }
+
         if ( this.props.reports ) {
             const reports = this.props.reports.map( (el, i) => {
                 return (this.props.editReportIndex === i ? 
                         <tr key={i} >
                             <td> <DatePicker
-                                selected={this.state.startDate}
+                                selected={this.state.editTracker.startDate}
                                 onChange={this.handleChange}
-                                dateFormat="YYYY-MM-DD"
+                                dateFormat="yyyy-MM-dd"
                             /></td>
-                                 {/* <input value={el.date}/> */}
-                            <td> <input  value={this.state.spent_time} readOnly='false'/>  </td>
-                            <td> <input type="text" name="spentTime" placeholder='введите значение' onChange={(e) => this.onChangeHandler('spent_time', e)} value={this.state.spent_time} />  </td>
-                            <td><button onClick={() => this.props.onHourAdded(+this.state.spent_time, el)}>save </button></td>
+                            <td> <input  value={this.state.editTracker.description} 
+                                        onChange={(e) => this.onChangeHandler('description', e, 'editTracker')} />  </td>
+                            <td> <input type="text" 
+                                        name="spentTime" 
+                                        placeholder='введите значение' 
+                                        onChange={(e) => this.onChangeHandler('spent_time', e, 'editTracker')} 
+                                        value={this.state.editTracker.spent_time} />  </td>
+                            <td><button onClick={() => this.props.onHourAdded(this.state.editTracker, el)}>save -</button></td>
                             <td><button onClick={() => this.props.onEditTracker(el, null)}>close </button></td>
                         </tr>
                  : <tr key={i} >
-                        <td>{el.date}</td>
+                        <td>{el.date}*</td>
                         <td>{el.description}</td>
                         <td>{el.spent_time}</td>
-                        <td><button onClick={() => this.props.onEditTracker(el, i)}>edit</button></td>                       
+                        <td><button onClick={() => this.onChangeHadlerState(el, i)}>edit</button></td>                       
                         <td><button onClick={() => this.props.onHourAdded(+el.spent_time + 1, el)}>inc</button></td>
                         <td><button onClick={() => this.props.onDicrementHour(+el.spent_time - 1, el)}>dec</button></td>
+                        <td><button onClick={() => this.onCopyReport(el)}>copy</button></td>
                     </tr>)
             });
-            burger = (
+            report = (
                 <Aux>
                     <div >
-                        <UnfoldedCalendar />
+                    {listReportsMonth.map((el,i) => {
+                        return (<span key={i}>
+                            {el}
+                        </span>)
+                    })}
+                    <UnfoldedCalendar />
                     <table className="tableReports">
                         <tbody>
                             <tr>
-                            <td> <DatePicker
+                            <td>/ <DatePicker
                                 selected={this.state.startDate}
                                 onChange={this.handleChange}
                                 dateFormat="yyyy-MM-dd"/>
                                 
                             </td>
-                            <td> <input  value={this.state.description} onChange={(e) => this.onChangeHandler('description', e)}/>  </td>
-                            <td> <input type="text" name="spentTime" placeholder='введите значение' onChange={(e) => this.onChangeHandler('spent_time', e)} value={this.state.spent_time} />  </td>
-                            <td> <button onClick={() => this.props.onHourAdded(+this.state.spent_time, {
+                            <td>/ <input  value={this.state.description} onChange={(e) => this.onChangeHandler('description', e, 'new')}/>  </td>
+                            <td>/ <input type="text" name="spentTime" placeholder='введите значение' onChange={(e) => this.onChangeHandler('spent_time', e, 'new')} value={this.state.spent_time} />  </td>
+                            <td> /<button onClick={() => this.props.onHourAdded(+this.state.spent_time, {
                                 date: this.state.startDate,
                                 description: this.state.description,
                                 project_id: 79,
                                 spent_time: this.state.spent_time,
                                 task: null,
                                 tracker_type: 4,
-                            })}> save </button></td>
+                            })}> save* </button></td>
                    
                         </tr>
                             {reports}
@@ -136,13 +178,12 @@ class BurgerBuilder extends Component {
                 purchaseContinued={this.purchaseContinueHandler} />;
         }
         // {salad: true, meat: false, ...}
-        console.log(999999);
         return (
             <Aux>
                 <Modal show={this.state.purchasing} modalClosed={this.purchaseCancelHandler}>
                     {orderSummary}
                 </Modal>
-                {burger}
+                {report}
             </Aux>
         );
     }
@@ -169,7 +210,8 @@ const mapDispatchToProps = dispatch => {
         onHourAdded: (spentTime, newDate) => dispatch(actions.addHour(spentTime, newDate)),
         onDicrementHour: (spentTime, newDate) => dispatch(actions.dicrementHour(spentTime, newDate)),
         onEditTracker: (tracker, i) => {
-            dispatch(actions.editTracker(tracker, i))
+            
+            return dispatch(actions.editTracker(tracker, i))
         }
     }
 }

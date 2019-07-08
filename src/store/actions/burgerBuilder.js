@@ -46,16 +46,16 @@ export const setUnfoldedCalendar = ( res ) => {
 };
 
 export const addHour = ( time, newDate ) => {
-    // console.log(time, newDate, moment);
-    // debugger
+    
     const newDateMod = {
-        date: moment(newDate.date).format('YYYY-MM-DD'),
-        description: newDate.description,
+        date: newDate.id ?   moment(time.startDate).format('YYYY-MM-DD') : moment(newDate.date).format('YYYY-MM-DD'),
+        description: newDate.id ? time.description : newDate.description,
         project_id: newDate.project_id,
-        spent_time: time,
+        spent_time: newDate.id ? time.spent_time : time,
         task: newDate.task,
         tracker_type: newDate.tracker_type,
     };
+
     const method = newDate.id ? 'patch' : 'post';
     const path = newDate.id ? newDate.id : 'new';
     return dispatch => {
