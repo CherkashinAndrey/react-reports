@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Route, Switch, withRouter, Redirect } from 'react-router-dom';
+import { Route, Switch, withRouter, Redirect, BrowserRouter as Router } from 'react-router-dom';
 import { connect } from 'react-redux';
 import asyncComponent from './hoc/asyncComponent/asyncComponent';
 
@@ -27,23 +27,29 @@ class App extends Component {
 
   render () {
     let routes = (
-      <Switch>
-        <Route path="/auth" component={asyncAuth} />
-        <Route path="/" exact component={BurgerBuilder} />
-        <Redirect to="/" />
-      </Switch>
+      <Router >
+        <Switch>
+          <Route path="/auth" component={asyncAuth} />
+          <Route path="/arhive" component={BurgerBuilder} />
+          <Route path="/reports" exact component={BurgerBuilder} />
+          <Redirect to="/reports" />
+        </Switch>
+      </Router>
     );
 
     if ( this.props.isAuthenticated ) {
       routes = (
-        <Switch>
-          <Route path="/checkout" component={asyncCheckout} />
-          <Route path="/orders" component={asyncOrders} />
-          <Route path="/logout" component={Logout} />
-          <Route path="/auth" component={asyncAuth} />
-          <Route path="/" exact component={BurgerBuilder} />
-          <Redirect to="/" />
-        </Switch>
+        <Router >
+          <Switch >
+            <Route path="/checkout" component={asyncCheckout} />
+            <Route path="/orders" component={asyncOrders} />
+            <Route path="/logout" component={Logout} />
+            <Route path="/auth" component={asyncAuth} />
+            <Route path="/arhive" component={BurgerBuilder} />
+            <Route path="/reports" exact component={BurgerBuilder} />
+            <Redirect to="/reports" />
+          </Switch>
+        </Router>
       );
     }
 

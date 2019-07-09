@@ -14,6 +14,9 @@ import DatePicker from 'react-datepicker';
 // import './../../../node_modules/react-datepicker/dist/react-datepicker.css';
 import UnfoldedCalendar from '../../components/UnfoldedCalendar/unfoldedCalendar';
 import * as moment from 'moment';
+import { NavLink } from 'react-router-dom';
+import Select from 'react-dropdown-select';
+// import styled from "@emotion/styled";
 
 class BurgerBuilder extends Component {
 
@@ -30,7 +33,22 @@ class BurgerBuilder extends Component {
     }
 
     componentDidMount () {
-        this.props.onInitIngredients();
+        this.onHandlerOnInitReports();
+        this.props.initFormFields();
+    }
+
+    onHandlerOnInitReports() {
+        const listReportsMonth = `from=${moment().startOf('month').subtract(1, 'month').format('YYYY-MM-DD')}&to=${moment().endOf('month').subtract(1, 'month').format('YYYY-MM-DD')}`;
+        setTimeout(() => {
+            const pathLocal = window.location.pathname.replace('/', '');
+            console.log('2',pathLocal);
+            if (pathLocal.length && pathLocal==='arhive') {
+                this.props.onInitIngredients(listReportsMonth);
+            } else {
+                this.props.onInitIngredients('');
+            }
+        },0)       
+ 
     }
 
     updatePurchaseState ( ingredients ) {
@@ -90,6 +108,10 @@ class BurgerBuilder extends Component {
         })
     }
 
+    setValues = (value) => {
+        console.log(value);
+    }
+
     render () {
         const disabledInfo = {
             ...this.props.ings
@@ -103,8 +125,63 @@ class BurgerBuilder extends Component {
         let report = this.props.error ? <p>Ingredients can't be loaded!</p> : <Spinner />;
         const listReportsMonth = [];
         for (let i=0; i<=1; i++) {
-            listReportsMonth.push( moment().startOf('month').subtract(i, 'month').format('MMM'));  
+            if (i===0) {
+                listReportsMonth.push( { month: moment().startOf('month').subtract(i, 'month').format('MMM'), path: '/reports'});  
+            }
+            if (i===1) {
+                listReportsMonth.push( { month: moment().startOf('month').subtract(i, 'month').format('MMM'), path: '/arhive'});  
+            }
         }
+
+        const optionsSelect = [
+            {
+                "id": 1,
+                "name": "Leanne Graham",
+                "username": "Bret",
+                "email": "Sincere@april.biz",
+                "address": {
+                  "street": "Kulas Light",
+                  "suite": "Apt. 556",
+                  "city": "Gwenborough",
+                  "zipcode": "92998-3874",
+                  "geo": {
+                    "lat": "-37.3159",
+                    "lng": "81.1496"
+                  }
+                },
+                "phone": "1-770-736-8031 x56442",
+                "website": "hildegard.org",
+                "company": {
+                  "name": "Romaguera-Crona",
+                  "catchPhrase": "Multi-layered client-server neural-net",
+                  "bs": "harness real-time e-markets"
+                }
+              },
+              {
+                "id": 2,
+                "name": "Ervin Howell",
+                "username": "Antonette",
+                "email": "Shanna@melissa.tv",
+                "address": {
+                  "street": "Victor Plains",
+                  "suite": "Suite 879",
+                  "city": "Wisokyburgh",
+                  "zipcode": "90566-7771",
+                  "geo": {
+                    "lat": "-43.9509",
+                    "lng": "-34.4618"
+                  }
+                },
+                "phone": "010-692-6593 x09125",
+                "website": "anastasia.net",
+                "company": {
+                  "name": "Deckow-Crist",
+                  "catchPhrase": "Proactive didactic contingency",
+                  "bs": "synergize scalable supply-chains"
+                }
+              },
+        ];
+
 
         if ( this.props.reports ) {
             const reports = this.props.reports.map( (el, i) => {
@@ -115,13 +192,25 @@ class BurgerBuilder extends Component {
                                 onChange={this.handleChange}
                                 dateFormat="yyyy-MM-dd"
                             /></td>
-                            <td> <input  value={this.state.editTracker.description} 
-                                        onChange={(e) => this.onChangeHandler('description', e, 'editTracker')} />  </td>
-                            <td> <input type="text" 
+                            <td> 
+                            <Select options={optionsSelect} onChange={(values) => this.setValues(values)} />
+                            {/* <select className="browser-default custom-select">
+                                <option>Choose your option</option>
+                                <option value="1">Option 1</option>
+                                <option value="2">Option 2</option>
+                                <option value="3">Option 3</option>
+                            </select> */}
+                                {/* <Select options={optionsSelect} /> */}
+                                <input  value={this.state.editTracker.description} 
+                                        onChange={(e) => this.onChangeHandler('description', e, 'editTracker')} />  
+                            </td>
+                            <td> 
+                                <input type="text" 
                                         name="spentTime" 
                                         placeholder='введите значение' 
                                         onChange={(e) => this.onChangeHandler('spent_time', e, 'editTracker')} 
-                                        value={this.state.editTracker.spent_time} />  </td>
+                                        value={this.state.editTracker.spent_time} />  
+                            </td>
                             <td><button onClick={() => this.props.onHourAdded(this.state.editTracker, el)}>save -</button></td>
                             <td><button onClick={() => this.props.onEditTracker(el, null)}>close </button></td>
                         </tr>
@@ -139,9 +228,18 @@ class BurgerBuilder extends Component {
                 <Aux>
                     <div >
                     {listReportsMonth.map((el,i) => {
-                        return (<span key={i}>
-                            {el}
-                        </span>)
+                        return (
+                            <NavLink
+                                key={i}
+                                to={el.path}
+                                className="Nav_link"
+                                onClick={this.onHandlerOnInitReports.bind(this)}
+                                activeClassName="activeRoute"
+                                activeStyle={{ color: 'red' }}
+                            >
+                            {el.month}
+                          </NavLink>
+                       )
                     })}
                     <UnfoldedCalendar />
                     <table className="tableReports">
@@ -204,15 +302,13 @@ const mapDispatchToProps = dispatch => {
     return {
         onIngredientAdded: (ingName) => dispatch(actions.addIngredient(ingName)),
         onIngredientRemoved: (ingName) => dispatch(actions.removeIngredient(ingName)),
-        onInitIngredients: () => dispatch(actions.initIngredients()),
+        onInitIngredients: (path) => dispatch(actions.initIngredients(path)),
         onInitPurchase: () => dispatch(actions.purchaseInit()),
         onSetAuthRedirectPath: (path) => dispatch(actions.setAuthRedirectPath(path)),
         onHourAdded: (spentTime, newDate) => dispatch(actions.addHour(spentTime, newDate)),
         onDicrementHour: (spentTime, newDate) => dispatch(actions.dicrementHour(spentTime, newDate)),
-        onEditTracker: (tracker, i) => {
-            
-            return dispatch(actions.editTracker(tracker, i))
-        }
+        onEditTracker: (tracker, i) => {return dispatch(actions.editTracker(tracker, i))},
+        initFormFields: () => dispatch(actions.initFormFields()),
     }
 }
 

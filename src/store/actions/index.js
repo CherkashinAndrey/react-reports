@@ -5,7 +5,8 @@ export {
     addHour,
     dicrementHour,
     editTracker,
-    onInitCalendar
+    onInitCalendar,
+    initFormFields,
 } from './burgerBuilder';
 export {
     purchaseBurger,

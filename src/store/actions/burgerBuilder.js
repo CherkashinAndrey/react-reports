@@ -24,6 +24,13 @@ export const setIngredients = ( ingredients ) => {
     };
 };
 
+export const setFormFields = (res) => {
+    return {
+        type: actionTypes.SET_FORM_FIELDS,
+        formFields: res
+    };
+}
+
 export const changeIncremrentTime = ( res ) => {
     return {
         type: actionTypes.CHANGE_REPORTS_TIME,
@@ -46,12 +53,11 @@ export const setUnfoldedCalendar = ( res ) => {
 };
 
 export const addHour = ( time, newDate ) => {
-    
     const newDateMod = {
-        date: newDate.id ?   moment(time.startDate).format('YYYY-MM-DD') : moment(newDate.date).format('YYYY-MM-DD'),
-        description: newDate.id ? time.description : newDate.description,
+        date: newDate.id  && typeof(time)!=='number' ?   moment(time.startDate).format('YYYY-MM-DD') : moment(newDate.date).format('YYYY-MM-DD'),
+        description: newDate.id && typeof(time)!=='number' ? time.description : newDate.description,
         project_id: newDate.project_id,
-        spent_time: newDate.id ? time.spent_time : time,
+        spent_time: newDate.id  && typeof(time)!=='number' ? time.spent_time : time,
         task: newDate.task,
         tracker_type: newDate.tracker_type,
     };
@@ -107,13 +113,13 @@ export const editTracker = (tracker, i) => {
     }
 }
 
-export const initIngredients = () => {
+export const initIngredients = (path = '') => {
+console.log('*path',path);
     return dispatch => {
-
-        axios.get( 'https://home.flexaspect.com/api/user/88/reports', { headers: { authorization: token } } )
+        axios.get( `https://home.flexaspect.com/api/user/88/reports${'?'+path}`, { headers: { authorization: token } } )
             .then( response => {
                 console.log(response);
-               dispatch(setIngredients(response));
+                dispatch(setIngredients(response));
             } )
             .catch( error => {
                 dispatch(fetchIngredientsFailed());
@@ -121,6 +127,20 @@ export const initIngredients = () => {
     };
     
 };
+
+export const initFormFields = () => {
+        return dispatch => {
+            axios.get( `https://home.flexaspect.com/api/reports/form-fields`, { headers: { authorization: token } } )
+                .then( response => {
+                    console.log(response);
+                   dispatch(setFormFields(response));
+                } )
+                .catch( error => {
+                    dispatch(fetchIngredientsFailed());
+                } );
+        };    
+};
+
 
 export const onInitCalendar = () => {
     return dispatch => {

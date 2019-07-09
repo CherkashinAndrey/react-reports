@@ -1,5 +1,6 @@
 import * as actionTypes from '../actions/actionTypes';
 import { updateObject } from '../../shared/utility';
+import { setFormFields } from '../actions/burgerBuilder';
 
 const initialState = {
     ingredients: null,
@@ -8,7 +9,8 @@ const initialState = {
     totalPrice: 4,
     error: false,
     building: false,
-    calendar: {}
+    calendar: {},
+    formField: null
 };
 
 const INGREDIENT_PRICES = {
@@ -87,6 +89,14 @@ const setUnfoldedCalendar = (state, action) => {
     });
 };
 
+const setFormFieldsState = (state, action) => {
+    return updateObject(state, {
+        formField: action.formFields.data,
+        error: false,
+        building: false
+    });
+}
+
 const fetchIngredientsFailed = (state, action) => {
     return updateObject( state, { error: true } );
 };
@@ -100,7 +110,7 @@ const reducer = ( state = initialState, action ) => {
         case actionTypes.CHANGE_REPORTS_TIME: return changeUpdateReportsTime(state, action);
         case actionTypes.EDIT_REPORT_INDEX: return editReportIndex(state, action);
         case actionTypes.SET_UNFOLDED_CALENDAR: return setUnfoldedCalendar(state, action);
-        
+        case actionTypes.SET_FORM_FIELDS : return setFormFieldsState(state, action);
         default: return state;
     }
 };
