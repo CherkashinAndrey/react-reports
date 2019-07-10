@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 import Aux from '../../hoc/Aux/Aux';
+import { SelectProject, SelectTrackers } from '../../helpers/selectProject';
 // import Burger from '../../components/Burger/Burger';
 // import BuildControls from '../../components/Burger/BuildControls/BuildControls';
 import Modal from '../../components/UI/Modal/Modal';
@@ -29,12 +30,15 @@ class BurgerBuilder extends Component {
             startDate: new Date(),
             spent_time: '',
             description: '',
-        }
+        },
+        selectedTracker: null
     }
 
     componentDidMount () {
         this.onHandlerOnInitReports();
-        this.props.initFormFields();
+        setTimeout(() => {
+            this.props.initFormFields();
+        },0);       
     }
 
     onHandlerOnInitReports() {
@@ -89,12 +93,14 @@ class BurgerBuilder extends Component {
     }
 
     onChangeHadlerState = (el, i) => {   
+        // debugger
         this.setState({
             editTracker : {
                 startDate: new Date(el.date),
                 spent_time: el.spent_time,
                 description: el.description
-            } 
+            },
+            selectedProject: new SelectProject( this.props.listForSelect.userProjects[0] , 0)
  
         })
         this.props.onEditTracker(el, i)
@@ -122,7 +128,7 @@ class BurgerBuilder extends Component {
         }
         let orderSummary = null;
         let monthReports = [];
-        let report = this.props.error ? <p>Ingredients can't be loaded!</p> : <Spinner />;
+        let report = this.props.error ? <p>Ingredients can't be loaded!!</p> : <Spinner />;
         const listReportsMonth = [];
         for (let i=0; i<=1; i++) {
             if (i===0) {
@@ -132,58 +138,27 @@ class BurgerBuilder extends Component {
                 listReportsMonth.push( { month: moment().startOf('month').subtract(i, 'month').format('MMM'), path: '/arhive'});  
             }
         }
+        // console.log('this.props',this.props.listForSelect.trackers);
 
-        const optionsSelect = [
-            {
-                "id": 1,
-                "name": "Leanne Graham",
-                "username": "Bret",
-                "email": "Sincere@april.biz",
-                "address": {
-                  "street": "Kulas Light",
-                  "suite": "Apt. 556",
-                  "city": "Gwenborough",
-                  "zipcode": "92998-3874",
-                  "geo": {
-                    "lat": "-37.3159",
-                    "lng": "81.1496"
-                  }
-                },
-                "phone": "1-770-736-8031 x56442",
-                "website": "hildegard.org",
-                "company": {
-                  "name": "Romaguera-Crona",
-                  "catchPhrase": "Multi-layered client-server neural-net",
-                  "bs": "harness real-time e-markets"
-                }
-              },
-              {
-                "id": 2,
-                "name": "Ervin Howell",
-                "username": "Antonette",
-                "email": "Shanna@melissa.tv",
-                "address": {
-                  "street": "Victor Plains",
-                  "suite": "Suite 879",
-                  "city": "Wisokyburgh",
-                  "zipcode": "90566-7771",
-                  "geo": {
-                    "lat": "-43.9509",
-                    "lng": "-34.4618"
-                  }
-                },
-                "phone": "010-692-6593 x09125",
-                "website": "anastasia.net",
-                "company": {
-                  "name": "Deckow-Crist",
-                  "catchPhrase": "Proactive didactic contingency",
-                  "bs": "synergize scalable supply-chains"
-                }
-              },
-        ];
+        let optionsSelectProjects = [];
+        let optionsSelectTrackers = [];
 
+        if (this.props.listForSelect && this.props.listForSelect.userProjects) {
+            optionsSelectProjects = this.props.listForSelect.userProjects.map((el,i) => {
+                return new SelectProject(el, i); //{...el, label : el.name, value : el.name, key : i }
+            })
+        } 
+        
+        if (this.props.listForSelect && this.props.listForSelect.trackers) {
+            optionsSelectTrackers = this.props.listForSelect.trackers.map((el,i) => {
+                return new SelectTrackers(el, i);
+            })
+        } 
+
+        
 
         if ( this.props.reports ) {
+            console.log('------------',this.state.selectedProject);
             const reports = this.props.reports.map( (el, i) => {
                 return (this.props.editReportIndex === i ? 
                         <tr key={i} >
@@ -192,18 +167,23 @@ class BurgerBuilder extends Component {
                                 onChange={this.handleChange}
                                 dateFormat="yyyy-MM-dd"
                             /></td>
-                            <td> 
-                            <Select options={optionsSelect} onChange={(values) => this.setValues(values)} />
-                            {/* <select className="browser-default custom-select">
-                                <option>Choose your option</option>
-                                <option value="1">Option 1</option>
-                                <option value="2">Option 2</option>
-                                <option value="3">Option 3</option>
-                            </select> */}
-                                {/* <Select options={optionsSelect} /> */}
-                                <input  value={this.state.editTracker.description} 
-                                        onChange={(e) => this.onChangeHandler('description', e, 'editTracker')} />  
+                               <td> 
+                            <Select 
+                                options={optionsSelectTrackers} 
+                                onChange={(values) => this.setValues(values)} 
+                                />
                             </td>
+                            <td> 
+                            <Select 
+                                options={optionsSelectProjects} 
+                                onChange={(values) => this.setValues(values)} 
+                                value={this.state.selectedProject}
+                                />
+                                {/* selectedValue={this.state.selectedProject} */}
+                                {/* <input  value={this.state.editTracker.description} 
+                                        onChange={(e) => this.onChangeHandler('description', e, 'editTracker')} />   */}
+                            </td>
+
                             <td> 
                                 <input type="text" 
                                         name="spentTime" 
@@ -294,7 +274,8 @@ const mapStateToProps = state => {
         error: state.burgerBuilder.error,
         isAuthenticated: state.auth.token !== null,
         reports: state.burgerBuilder.reports,
-        editReportIndex: state.burgerBuilder.editReportIndex
+        editReportIndex: state.burgerBuilder.editReportIndex,
+        listForSelect: state.burgerBuilder.formField,
     };
 }
 

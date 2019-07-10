@@ -27,19 +27,16 @@ class App extends Component {
 
   render () {
     let routes = (
-      <Router >
         <Switch>
           <Route path="/auth" component={asyncAuth} />
           <Route path="/arhive" component={BurgerBuilder} />
           <Route path="/reports" exact component={BurgerBuilder} />
           <Redirect to="/reports" />
         </Switch>
-      </Router>
     );
 
     if ( this.props.isAuthenticated ) {
       routes = (
-        <Router >
           <Switch >
             <Route path="/checkout" component={asyncCheckout} />
             <Route path="/orders" component={asyncOrders} />
@@ -49,7 +46,6 @@ class App extends Component {
             <Route path="/reports" exact component={BurgerBuilder} />
             <Redirect to="/reports" />
           </Switch>
-        </Router>
       );
     }
 

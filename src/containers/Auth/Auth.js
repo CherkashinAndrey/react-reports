@@ -112,6 +112,7 @@ class Auth extends Component {
 
         return (
             <div className={classes.Auth}>
+                andrii.cherkashyn@flexaspect.com
                 {authRedirect}
                 {errorMessage}
                 <form onSubmit={this.submitHandler}>

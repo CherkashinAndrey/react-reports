@@ -64,8 +64,8 @@ export const addHour = ( time, newDate ) => {
 
     const method = newDate.id ? 'patch' : 'post';
     const path = newDate.id ? newDate.id : 'new';
-    return dispatch => {
-        axios[method]( `https://home.flexaspect.com/api/${newDate.id ? '' : 'user/'}reports/${path}`, newDateMod , { headers: { authorization: token } } )
+    return (dispatch, getState) => {
+        axios[method]( `https://home.flexaspect.com/api/${newDate.id ? '' : 'user/'}reports/${path}`, newDateMod , { headers: { authorization: `Bearer ` + getState().auth.token } } )
             .then( response => {
                 console.log(response);
                dispatch(onInitCalendar());
@@ -91,8 +91,8 @@ export const dicrementHour = ( time, newDate ) => {
         tracker_type: newDate.tracker_type,
     };
 
-    return dispatch => {
-        axios.patch( `https://home.flexaspect.com/api/reports/${newDate.id}`, newDateMod , { headers: { authorization: token } } )
+    return (dispatch, getState) => {
+        axios.patch( `https://home.flexaspect.com/api/reports/${newDate.id}`, newDateMod , { headers: { authorization: `Bearer ` + getState().auth.token } } )
             .then( response => {
                 console.log(response);
                 dispatch(onInitCalendar());
@@ -104,7 +104,6 @@ export const dicrementHour = ( time, newDate ) => {
     };
 }
 
-
 export const editTracker = (tracker, i) => {
     console.log(tracker);
     return {
@@ -115,8 +114,8 @@ export const editTracker = (tracker, i) => {
 
 export const initIngredients = (path = '') => {
 console.log('*path',path);
-    return dispatch => {
-        axios.get( `https://home.flexaspect.com/api/user/88/reports${'?'+path}`, { headers: { authorization: token } } )
+    return (dispatch, getState) => {
+        axios.get( `https://home.flexaspect.com/api/user/88/reports${'?'+path}`, { headers: { authorization: `Bearer ` + getState().auth.token } } )
             .then( response => {
                 console.log(response);
                 dispatch(setIngredients(response));
@@ -129,8 +128,8 @@ console.log('*path',path);
 };
 
 export const initFormFields = () => {
-        return dispatch => {
-            axios.get( `https://home.flexaspect.com/api/reports/form-fields`, { headers: { authorization: token } } )
+        return (dispatch, getState) => {
+            axios.get( `https://home.flexaspect.com/api/reports/form-fields`, { headers: { authorization: `Bearer ` + getState().auth.token } } )
                 .then( response => {
                     console.log(response);
                    dispatch(setFormFields(response));
@@ -143,8 +142,8 @@ export const initFormFields = () => {
 
 
 export const onInitCalendar = () => {
-    return dispatch => {
-        axios.get( 'https://home.flexaspect.com/api/user/calendar', { headers: { authorization: token } } )
+    return (dispatch, getState) => {
+        axios.get( 'https://home.flexaspect.com/api/user/calendar', { headers: { authorization: `Bearer ` + getState().auth.token } } )
             .then( response => {
                 console.log('calendar',response);
                 dispatch(setUnfoldedCalendar(response));
