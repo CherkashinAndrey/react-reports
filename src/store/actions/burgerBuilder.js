@@ -1,6 +1,6 @@
 import * as actionTypes from './actionTypes';
 import axios from '../../axios-orders';
-import { token } from '../../consts/token';
+// import { token } from '../../consts/token';
 import * as moment from 'moment';
 
 export const addIngredient = ( name ) => {
@@ -53,6 +53,7 @@ export const setUnfoldedCalendar = ( res ) => {
 };
 
 export const addHour = ( time, newDate ) => {
+    debugger
     const newDateMod = {
         date: newDate.id  && typeof(time)!=='number' ?   moment(time.startDate).format('YYYY-MM-DD') : moment(newDate.date).format('YYYY-MM-DD'),
         description: newDate.id && typeof(time)!=='number' ? time.description : newDate.description,
@@ -105,7 +106,6 @@ export const dicrementHour = ( time, newDate ) => {
 }
 
 export const editTracker = (tracker, i) => {
-    console.log(tracker);
     return {
         type: actionTypes.EDIT_REPORT_INDEX,
         editReportIndex: i

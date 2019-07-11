@@ -1,6 +1,6 @@
 import * as actionTypes from '../actions/actionTypes';
 import { updateObject } from '../../shared/utility';
-import { setFormFields } from '../actions/burgerBuilder';
+// import { setFormFields } from '../actions/burgerBuilder';
 
 const initialState = {
     ingredients: null,

@@ -16,7 +16,8 @@ import DatePicker from 'react-datepicker';
 import UnfoldedCalendar from '../../components/UnfoldedCalendar/unfoldedCalendar';
 import * as moment from 'moment';
 import { NavLink } from 'react-router-dom';
-import Select from 'react-dropdown-select';
+import Select from 'react-select'
+// import Select from 'react-dropdown-select';
 // import styled from "@emotion/styled";
 
 class BurgerBuilder extends Component {
@@ -31,7 +32,8 @@ class BurgerBuilder extends Component {
             spent_time: '',
             description: '',
         },
-        selectedTracker: null
+        selectedTracker: null,
+        selectedProject: null,
     }
 
     componentDidMount () {
@@ -92,30 +94,46 @@ class BurgerBuilder extends Component {
             ) : this.setState({[term]: e.target.value})
     }
 
-    onChangeHadlerState = (el, i) => {   
-        // debugger
+    onChangeHadlerState = (item, i) => {   
         this.setState({
             editTracker : {
-                startDate: new Date(el.date),
-                spent_time: el.spent_time,
-                description: el.description
+                startDate: new Date(item.date),
+                spent_time: item.spent_time,
+                description: item.description
             },
-            selectedProject: new SelectProject( this.props.listForSelect.userProjects[0] , 0)
- 
+            selectedProject: new SelectProject( this.props.listForSelect.userProjects.find(el => el.id === item.project_id) , 0),
+            selectedTracker: new SelectTrackers( this.props.listForSelect.trackers.find(el => el.id === item.tracker_type) , 0)
         })
-        this.props.onEditTracker(el, i)
+        console.log('-----------------', item, this.state, this.props.listForSelect);
+        this.props.onEditTracker(item, i)
     }
 
     onCopyReport = (el) => {
         this.setState({
-            startDate: new Date(el.date),
+            startDate: new Date(),
             spent_time: el.spent_time,
             description: el.description
         })
     }
 
-    setValues = (value) => {
+    setValues = (term, value) => {
         console.log(value);
+        switch(term) {
+            case 'trackers':
+                   this.setState({selectedTracker: new SelectTrackers( value , 0)})
+                break;
+            case 'project': 
+                    this.setState({selectedProject: new SelectProject( value , 0)})
+                break;
+            default:
+                break;
+        }
+    }
+
+    onHandlerEdit = (el) => {
+        el.project_id = this.state.selectedProject.id;
+        el.tracker_type = this.state.selectedTracker.id;
+        this.props.onHourAdded(this.state.editTracker, el)
     }
 
     render () {
@@ -127,7 +145,7 @@ class BurgerBuilder extends Component {
             disabledInfo[key] = disabledInfo[key] <= 0
         }
         let orderSummary = null;
-        let monthReports = [];
+        // let monthReports = [];
         let report = this.props.error ? <p>Ingredients can't be loaded!!</p> : <Spinner />;
         const listReportsMonth = [];
         for (let i=0; i<=1; i++) {
@@ -158,7 +176,6 @@ class BurgerBuilder extends Component {
         
 
         if ( this.props.reports ) {
-            console.log('------------',this.state.selectedProject);
             const reports = this.props.reports.map( (el, i) => {
                 return (this.props.editReportIndex === i ? 
                         <tr key={i} >
@@ -170,13 +187,14 @@ class BurgerBuilder extends Component {
                                <td> 
                             <Select 
                                 options={optionsSelectTrackers} 
-                                onChange={(values) => this.setValues(values)} 
+                                onChange={(values) => this.setValues('trackers', values)} 
+                                value={this.state.selectedTracker}
                                 />
                             </td>
                             <td> 
                             <Select 
                                 options={optionsSelectProjects} 
-                                onChange={(values) => this.setValues(values)} 
+                                onChange={(values) => this.setValues('project', values)} 
                                 value={this.state.selectedProject}
                                 />
                                 {/* selectedValue={this.state.selectedProject} */}
@@ -186,12 +204,13 @@ class BurgerBuilder extends Component {
 
                             <td> 
                                 <input type="text" 
+                                        className="input"
                                         name="spentTime" 
                                         placeholder='введите значение' 
                                         onChange={(e) => this.onChangeHandler('spent_time', e, 'editTracker')} 
                                         value={this.state.editTracker.spent_time} />  
                             </td>
-                            <td><button onClick={() => this.props.onHourAdded(this.state.editTracker, el)}>save -</button></td>
+                            <td><button onClick={() => this.onHandlerEdit(el)}>save</button></td>
                             <td><button onClick={() => this.props.onEditTracker(el, null)}>close </button></td>
                         </tr>
                  : <tr key={i} >
@@ -231,8 +250,8 @@ class BurgerBuilder extends Component {
                                 dateFormat="yyyy-MM-dd"/>
                                 
                             </td>
-                            <td>/ <input  value={this.state.description} onChange={(e) => this.onChangeHandler('description', e, 'new')}/>  </td>
-                            <td>/ <input type="text" name="spentTime" placeholder='введите значение' onChange={(e) => this.onChangeHandler('spent_time', e, 'new')} value={this.state.spent_time} />  </td>
+                            <td>/ <input className="input" value={this.state.description} onChange={(e) => this.onChangeHandler('description', e, 'new')}/>  </td>
+                            <td>/ <input className="input" type="text" name="spentTime" placeholder='введите значение' onChange={(e) => this.onChangeHandler('spent_time', e, 'new')} value={this.state.spent_time} />  </td>
                             <td> /<button onClick={() => this.props.onHourAdded(+this.state.spent_time, {
                                 date: this.state.startDate,
                                 description: this.state.description,
