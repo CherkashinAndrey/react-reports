@@ -2,6 +2,7 @@ import * as actionTypes from './actionTypes';
 import axios from '../../axios-orders';
 // import { token } from '../../consts/token';
 import * as moment from 'moment';
+import { url } from '../../consts/url';
 
 export const addIngredient = ( name ) => {
     return {
@@ -53,9 +54,8 @@ export const setUnfoldedCalendar = ( res ) => {
 };
 
 export const addHour = ( time, newDate ) => {
-    debugger
     const newDateMod = {
-        date: newDate.id  && typeof(time)!=='number' ?   moment(time.startDate).format('YYYY-MM-DD') : moment(newDate.date).format('YYYY-MM-DD'),
+        date: newDate.id  && typeof(time)!=='number' ? moment(time.startDate).format('YYYY-MM-DD') : moment(newDate.date).format('YYYY-MM-DD'),
         description: newDate.id && typeof(time)!=='number' ? time.description : newDate.description,
         project_id: newDate.project_id,
         spent_time: newDate.id  && typeof(time)!=='number' ? time.spent_time : time,
@@ -66,7 +66,7 @@ export const addHour = ( time, newDate ) => {
     const method = newDate.id ? 'patch' : 'post';
     const path = newDate.id ? newDate.id : 'new';
     return (dispatch, getState) => {
-        axios[method]( `https://home.flexaspect.com/api/${newDate.id ? '' : 'user/'}reports/${path}`, newDateMod , { headers: { authorization: `Bearer ` + getState().auth.token } } )
+        axios[method]( `${url}/${newDate.id ? '' : 'user/'}reports/${path}`, newDateMod , { headers: { authorization: `Bearer ` + getState().auth.token } } )
             .then( response => {
                 console.log(response);
                dispatch(onInitCalendar());
@@ -93,7 +93,7 @@ export const dicrementHour = ( time, newDate ) => {
     };
 
     return (dispatch, getState) => {
-        axios.patch( `https://home.flexaspect.com/api/reports/${newDate.id}`, newDateMod , { headers: { authorization: `Bearer ` + getState().auth.token } } )
+        axios.patch( `${url}/reports/${newDate.id}`, newDateMod , { headers: { authorization: `Bearer ` + getState().auth.token } } )
             .then( response => {
                 console.log(response);
                 dispatch(onInitCalendar());
@@ -115,7 +115,7 @@ export const editTracker = (tracker, i) => {
 export const initIngredients = (path = '') => {
 console.log('*path',path);
     return (dispatch, getState) => {
-        axios.get( `https://home.flexaspect.com/api/user/88/reports${'?'+path}`, { headers: { authorization: `Bearer ` + getState().auth.token } } )
+        axios.get( `${url}/user/88/reports${'?'+path}`, { headers: { authorization: `Bearer ` + getState().auth.token } } )
             .then( response => {
                 console.log(response);
                 dispatch(setIngredients(response));
@@ -129,7 +129,7 @@ console.log('*path',path);
 
 export const initFormFields = () => {
         return (dispatch, getState) => {
-            axios.get( `https://home.flexaspect.com/api/reports/form-fields`, { headers: { authorization: `Bearer ` + getState().auth.token } } )
+            axios.get( `${url}/reports/form-fields`, { headers: { authorization: `Bearer ` + getState().auth.token } } )
                 .then( response => {
                     console.log(response);
                    dispatch(setFormFields(response));
@@ -143,7 +143,7 @@ export const initFormFields = () => {
 
 export const onInitCalendar = () => {
     return (dispatch, getState) => {
-        axios.get( 'https://home.flexaspect.com/api/user/calendar', { headers: { authorization: `Bearer ` + getState().auth.token } } )
+        axios.get( `${url}/user/calendar`, { headers: { authorization: `Bearer ` + getState().auth.token } } )
             .then( response => {
                 console.log('calendar',response);
                 dispatch(setUnfoldedCalendar(response));

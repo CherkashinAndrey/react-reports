@@ -1,6 +1,7 @@
 import * as actionTypes from '../actions/actionTypes';
 import { updateObject } from '../../shared/utility';
 // import { setFormFields } from '../actions/burgerBuilder';
+import { SelectProject, SelectTrackers } from '../../helpers/selectProject';
 
 const initialState = {
     ingredients: null,
@@ -43,6 +44,12 @@ const removeIngredient = (state, action) => {
 };
 
 const setIngredients = (state, action) => {
+
+    let reports = [];
+    reports = action.ingredients.data.map(el => {
+        return el;
+    });
+
     return updateObject( state, {
         ingredients: {
             salad: action.ingredients.salad,
@@ -50,7 +57,7 @@ const setIngredients = (state, action) => {
             cheese: action.ingredients.cheese,
             meat: action.ingredients.meat
         },
-        reports: action.ingredients.data,
+        reports: reports,
         totalPrice: 4,
         error: false,
         building: false
